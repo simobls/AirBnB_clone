@@ -19,7 +19,7 @@ class TestBaseModel(unittest.TestCase):
         base = BaseModel()
         self.assertEqual(base.__str__(),
                          f"[{type(base).__name__}] \
-({base.id}) {base.__dict__}")
+                        ({base.id}) {base.__dict__}")
 
     def test_to_dict(self):
         """
