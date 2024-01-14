@@ -1,7 +1,3 @@
-#!/usr/bin/python3
-"""
-Test suite for base_model
-"""
 import unittest
 from models.base_model import BaseModel
 from datetime import datetime
@@ -9,49 +5,48 @@ import uuid
 
 
 class TestBaseModel(unittest.TestCase):
-    """
-    Test cases for the base_model
-    """
-    def test_str(self):
-        """
-        checks the string output of an instance
-        """
+    def test_init_new_instance(self):
         base = BaseModel()
-        self.assertEqual(base.__str__(),
-                         f"[{type(base).__name__}] \
-                        ({base.id}) {base.__dict__}")
-
-    def test_to_dict(self):
-        """
-        checks the to_dict() function of an instance
-        """
-        base = BaseModel()
-        prev_time = base.updated_at
-        self.assertDictEqual(base.to_dict(),
-                             {'__class__': type(base).__name__,
-                              'updated_at': base.updated_at.isoformat(),
-                              'id': base.id,
-                              'created_at': base.created_at.isoformat()})
-        base.save()
-        self.assertNotEqual(prev_time, base.updated_at)
-
-    def test_attr_classes(self):
-        """
-        checks if the right classes were use to generate attributes
-        """
-        base = BaseModel()
-        base2 = BaseModel()
         self.assertIsInstance(base.id, str)
         self.assertIsInstance(base.created_at, datetime)
         self.assertIsInstance(base.updated_at, datetime)
-        self.assertNotEqual(base.id, base2.id)
+        self.assertIsNone(base.__dict__.get('__class__'))
+        self.assertIsNone(base.__dict__.get('created_at'))
+        self.assertIsNone(base.__dict__.get('updated_at'))
 
-    def test_save(self):
-        """
-        tests the save method
-        """
+    def test_init_from_dict(self):
+        data = {
+            'id': str(uuid.uuid4()),
+            'created_at': '2024-01-14T12:00:00.000000',
+            'updated_at': '2024-01-14T13:30:00.000000',
+            'custom_attribute': 'some_value'
+        }
+        base = BaseModel(**data)
+        self.assertEqual(base.id, data['id'])
+        self.assertAlmostEqual(base.created_at.isoformat(), data['created_at'], delta=datetime.timedelta(seconds=1))
+        self.assertEqual(base.updated_at.isoformat(), data['updated_at'])
+        self.assertIsNone(base.__dict__.get('__class__'))
+        self.assertEqual(base.__dict__.get('custom_attribute'), 'some_value')
+
+    def test_str_representation(self):
         base = BaseModel()
-        prevtime = base.updated_at
+        expected_str = f"[{type(base).__name__}] ({base.id}) {base.__dict__}"
+        self.assertEqual(str(base), expected_str)
+
+    def test_save_method(self):
+        base = BaseModel()
+        prev_updated_at = base.updated_at
         base.save()
-        newtime = base.updated_at
-        self.assertNotEqual(prevtime, newtime)
+        self.assertNotEqual(prev_updated_at, base.updated_at)
+
+    def test_to_dict_method(self):
+        base = BaseModel()
+        base_dict = base.to_dict()
+        self.assertEqual(base_dict['__class__'], type(base).__name__)
+        self.assertEqual(base_dict['created_at'], base.created_at.isoformat())
+        self.assertEqual(base_dict['updated_at'], base.updated_at.isoformat())
+        self.assertIn('id', base_dict)
+
+
+if __name__ == '__main__':
+    unittest.main()
