@@ -1,30 +1,23 @@
 import unittest
+from models import storage
 from models.engine.file_storage import FileStorage
 
+class TestInit(unittest.TestCase):
+    def test_storage_instance(self):
+        # Create a unique FileStorage instance for your application
+        storage_instance = storage._FileStorage__objects
 
-class TestFileStorageInitialization(unittest.TestCase):
-    def test_file_storage_instance_creation(self):
-        storage = FileStorage()
-        self.assertIsInstance(storage, FileStorage)
-        self.assertEqual(storage._FileStorage__file_path, "file.json")
-        self.assertIsInstance(storage._FileStorage__objects, dict)
+        # Check that the storage instance is of the expected type
+        self.assertIsInstance(storage_instance, dict)
 
-    def test_reload_method(self):
-        storage = FileStorage()
-        # Assuming the file.json does not exist initially
-        with self.assertRaises(FileNotFoundError):
-            storage.reload()
+        # Check that the storage instance is empty
+        self.assertEqual(len(storage_instance), 0)
 
-        # Now create a dummy file.json for testing
-        dummy_data = '{"BaseModel.123": {"id": "123", "name": "TestObject"}}'
-        with open("file.json", "w") as dummy_file:
-            dummy_file.write(dummy_data)
-
-        # Reload after creating the dummy file
+        # Call the reload() method on the storage instance
         storage.reload()
-        self.assertTrue(storage._FileStorage__objects)
-        self.assertIn("BaseModel.123", storage._FileStorage__objects)
 
+        # Check that the storage instance is not empty after reloading
+        self.assertNotEqual(len(storage_instance), 0)
 
 if __name__ == '__main__':
     unittest.main()

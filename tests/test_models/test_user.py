@@ -1,12 +1,11 @@
-#!/usr/bin/python3
-"""
-Test suite for base_model
-"""
 import unittest
-from models.base_model import BaseModel
+from models.user import User
 
-
-class TestBaseModel(unittest.TestCase):
-    def test_str(self):
-        base1 = BaseModel()
-        self.assertEqual(base1.__class__, BaseModel)
+class TestUser(unittest.TestCase):
+    def test_init(self):
+        user = User()
+        self.assertIsInstance(user, User)
+        self.assertIsInstance(user.email, str)
+        self.assertIsInstance(user.password, str)
+        self.assertIsInstance(user.first_name, str)
+        self.assertIsInstance(user.last_name, str)
